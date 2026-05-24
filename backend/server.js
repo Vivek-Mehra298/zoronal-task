@@ -11,9 +11,16 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
+// Debug logging - check all environment variables
+console.log('=== Environment Variables Debug ===');
+console.log('PORT:', process.env.PORT);
+console.log('MONGO_URI exists:', !!process.env.MONGO_URI);
+console.log('All env keys:', Object.keys(process.env).filter(k => k.includes('MONGO') || k === 'PORT'));
+console.log('=====================================');
+
 // Ensure MONGO_URI is set
 if (!MONGO_URI) {
-  console.error('❌ ERROR: MONGO_URI environment variable is not set!');
+  console.error('\n❌ ERROR: MONGO_URI environment variable is not set!');
   console.error('On Render: Add MONGO_URI to Environment Variables in dashboard');
   console.error('Locally: Add MONGO_URI to backend/.env file');
   process.exit(1);
