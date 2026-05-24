@@ -29,9 +29,12 @@ export default function App() {
     try {
       setLoading(true);
       const res = await axios.get(`${API_BASE}/companies`);
-      setCompanies(res.data);
+      // Ensure data is an array
+      const data = Array.isArray(res.data) ? res.data : [];
+      setCompanies(data);
     } catch (err) {
       console.error('Error fetching companies list:', err);
+      setCompanies([]); // Set to empty array on error
       showToast('Failed to load companies directory.', 'error');
     } finally {
       setLoading(false);

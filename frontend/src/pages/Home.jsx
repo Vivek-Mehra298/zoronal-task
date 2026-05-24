@@ -20,17 +20,20 @@ export default function Home({ companies, loading, onSelectCompany, onAddCompany
 
   // Derive city list and founded years for dropdowns dynamically from companies data!
   const cities = useMemo(() => {
+    if (!Array.isArray(companies)) return [];
     const allCities = companies.map((c) => c.city).filter(Boolean);
     return [...new Set(allCities)].sort();
   }, [companies]);
 
   const foundedYears = useMemo(() => {
+    if (!Array.isArray(companies)) return [];
     const allYears = companies.map((c) => c.foundedOn).filter(Boolean);
     return [...new Set(allYears)].sort((a, b) => b - a);
   }, [companies]);
 
   // Real-time Filtering
   const filteredCompanies = useMemo(() => {
+    if (!Array.isArray(companies)) return [];
     return companies.filter((company) => {
       const matchesSearch = company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             company.description.toLowerCase().includes(searchTerm.toLowerCase());
