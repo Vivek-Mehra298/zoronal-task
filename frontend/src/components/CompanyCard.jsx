@@ -3,7 +3,10 @@ import StarRating from './StarRating';
 import { MapPin, Calendar, Star } from 'lucide-react';
 
 export default function CompanyCard({ company, onClick }) {
-  const { name, logoUrl, description, location, city, foundedOn, averageRating = 0, reviewCount = 0 } = company;
+  // Defensive check for company object
+  if (!company || typeof company !== 'object') return null;
+  
+  const { name = 'Unknown', logoUrl, description = 'No description', location, city = 'N/A', foundedOn = 'N/A', averageRating = 0, reviewCount = 0 } = company;
 
   return (
     <div

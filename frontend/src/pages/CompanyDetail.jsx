@@ -14,7 +14,7 @@ export default function CompanyDetail({ companyId, onBack, onAddReviewSuccess })
   const [likedReviews, setLikedReviews] = useState(new Set()); // track local liked review IDs to prevent multi-clicking in same session
   const [error, setError] = useState(null);
 
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 
   const fetchCompanyDetails = async () => {
     try {

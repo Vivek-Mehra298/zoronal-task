@@ -35,9 +35,16 @@ export default function Home({ companies, loading, onSelectCompany, onAddCompany
   const filteredCompanies = useMemo(() => {
     if (!Array.isArray(companies)) return [];
     return companies.filter((company) => {
-      const matchesSearch = company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            company.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCity = selectedCity === '' || company.city === selectedCity;
+      // Defensive checks for undefined properties
+      if (!company || typeof company !== 'object') return false;
+      
+      const name = company.name || '';
+      const description = company.description || '';
+      const city = company.city || '';
+      
+      const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCity = selectedCity === '' || city === selectedCity;
       const matchesYear = selectedYear === '' || company.foundedOn === Number(selectedYear);
       return matchesSearch && matchesCity && matchesYear;
     });
