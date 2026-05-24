@@ -9,7 +9,15 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/company_reviews';
+const MONGO_URI = process.env.MONGO_URI;
+
+// Ensure MONGO_URI is set
+if (!MONGO_URI) {
+  console.error('❌ ERROR: MONGO_URI environment variable is not set!');
+  console.error('On Render: Add MONGO_URI to Environment Variables in dashboard');
+  console.error('Locally: Add MONGO_URI to backend/.env file');
+  process.exit(1);
+}
 
 // Middlewares
 app.use(cors());
