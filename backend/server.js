@@ -28,8 +28,8 @@ app.get('/health', (req, res) => {
 mongoose.connect(MONGO_URI)
   .then(() => {
     console.log('Successfully connected to MongoDB Database');
-    app.listen(PORT, () => {
-      console.log(`Server is running in dev mode on port ${PORT}`);
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Server is running on port ${PORT}`);
     });
   })
   .catch((error) => {
