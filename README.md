@@ -101,6 +101,25 @@ The frontend will be available at `http://localhost:5173` (default Vite port)
 - Vite
 - CSS
 
+## Deployment
+
+This project is ready for production deployment on:
+- **Database**: MongoDB Atlas (Cloud MongoDB)
+- **Backend**: Render (Node.js Server)
+- **Frontend**: Vercel (React App)
+
+### Quick Start Deployment
+
+For complete step-by-step deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md)
+
+**Quick Summary:**
+1. Set up MongoDB Atlas cluster
+2. Deploy backend to Render
+3. Deploy frontend to Vercel
+4. Connect services with environment variables
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
+
 ## Contributing
 
 1. Create a feature branch

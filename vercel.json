@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "frontend/dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "^/(?!api).*",
+      "dest": "frontend/dist/index.html"
+    }
+  ],
+  "env": {
+    "VITE_API_BASE": "https://zoronal-backend.onrender.com/api"
+  }
+}

@@ -23,7 +23,7 @@ export default function App() {
   // Toast Notification State
   const [toast, setToast] = useState(null); // { message: string, type: 'success' | 'error' }
 
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 
   const fetchCompanies = async () => {
     try {

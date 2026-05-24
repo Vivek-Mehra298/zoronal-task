@@ -33,3 +33,7 @@ logs/
 # Temporary files
 *.tmp
 temp/
+
+DEPLOYMENT.md
+ENV_SETUP.md
+

@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: zoronal-backend
+    env: node
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: MONGO_URI
+        scope: run
+        value: ${MONGO_URI}
+      - key: PORT
+        scope: run
+        value: 5000
