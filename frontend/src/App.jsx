@@ -24,6 +24,7 @@ export default function App() {
   const [toast, setToast] = useState(null); // { message: string, type: 'success' | 'error' }
 
   const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
+  const COMPANIES_CACHE_KEY = 'zoronal_companies_cache_v1';
 
   const fetchCompanies = async () => {
     try {
@@ -32,10 +33,31 @@ export default function App() {
       // Ensure data is an array
       const data = Array.isArray(res.data) ? res.data : [];
       setCompanies(data);
+      try {
+        localStorage.setItem(COMPANIES_CACHE_KEY, JSON.stringify(data));
+      } catch {
+        // ignore cache write errors
+      }
     } catch (err) {
       console.error('Error fetching companies list:', err);
-      setCompanies([]); // Set to empty array on error
-      showToast('Failed to load companies directory.', 'error');
+      // Don't wipe UI on transient backend/DB failures.
+      let restored = false;
+      try {
+        const cached = JSON.parse(localStorage.getItem(COMPANIES_CACHE_KEY) || 'null');
+        if (Array.isArray(cached) && cached.length > 0) {
+          setCompanies(cached);
+          restored = true;
+        }
+      } catch {
+        // ignore cache read/parse errors
+      }
+
+      showToast(
+        restored
+          ? 'Backend is unavailable — showing last saved list.'
+          : 'Failed to load companies directory.',
+        'error'
+      );
     } finally {
       setLoading(false);
     }

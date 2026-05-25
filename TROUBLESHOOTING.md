@@ -1,121 +1,55 @@
-# Troubleshooting: Companies Not Persisting
+# Troubleshooting: Companies Disappear After Refresh
 
-## Problem
-When you add a company, it shows temporarily but disappears after page refresh.
+## What’s happening
+When the page refreshes, the frontend reloads the companies list from the backend (`GET /api/companies`). If the backend is down or can’t reach MongoDB Atlas, that request fails and the UI shows an empty list.
 
-## Root Cause
-Companies are only stored in React state (memory). When page refreshes, data is lost unless it was saved to MongoDB.
-
-## Solutions
-
-### Step 1: Check Backend Server
-Run the backend and look for these messages:
+## 1) Check backend logs (local or Render)
+Start the backend:
 
 ```bash
 cd backend
 npm start
 ```
 
-**Expected Output:**
-```
-✅ Successfully connected to MongoDB Database
-✅ Server is running on port 5000
-✨ Ready to receive requests!
-```
+Healthy logs look like:
+- `Server listening on port 5000`
+- `Connected to MongoDB`
 
-**If you see this instead:**
-```
-❌ ERROR: MONGO_URI environment variable is not set!
-```
+If you see:
+- `ERROR: MONGO_URI environment variable is not set!` → set `MONGO_URI` in `backend/.env` (local) or Render env vars (prod)
+- `Database connection error: querySrv ETIMEOUT ...` → Atlas is not reachable (IP whitelist / DNS / cluster paused)
 
-Then:
-- Make sure `backend/.env` has the correct `MONGO_URI`
-- Format: `mongodb+srv://username:password@cluster.mongodb.net/company_reviews`
+## 2) Verify MongoDB Atlas network access
+In MongoDB Atlas:
+- **Network Access** → add your current IP (for local) and/or allow all IPs (`0.0.0.0/0`) so Render can connect.
 
-### Step 2: Check MongoDB Atlas
+## 3) Verify health endpoint
+Open `http://localhost:5000/health`.
 
-1. Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-2. Click your cluster
-3. Go to **Network Access** tab
-4. Make sure your current IP is whitelisted
-   - Or add `0.0.0.0/0` to allow all IPs
+`dbState` meanings (Mongoose):
+- `1` = connected
+- `0` = disconnected
+- `2` = connecting
+- `3` = disconnecting
 
-### Step 3: Verify Database Connectivity
-
-Test locally if data is actually being saved:
-
-1. Start backend: `npm start` (from backend folder)
-2. Open Postman or use `curl`
-3. Make a POST request:
+## 4) Quick API test (local)
+Create a company:
 
 ```bash
-curl -X POST http://localhost:5000/api/companies \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Test Company",
-    "logoUrl": "https://example.com/logo.png",
-    "description": "Test description for company",
-    "location": "New York",
-    "city": "New York",
-    "foundedOn": 2020
-  }'
+curl -X POST http://localhost:5000/api/companies ^
+  -H "Content-Type: application/json" ^
+  -d "{\"name\":\"Test Company\",\"logoUrl\":\"https://example.com/logo.png\",\"description\":\"Test description for company\",\"location\":\"New York\",\"city\":\"New York\",\"foundedOn\":2020}"
 ```
 
-Expected response:
-```json
-{
-  "_id": "...",
-  "name": "Test Company",
-  "reviewCount": 0,
-  "averageRating": 0
-}
-```
-
-4. Then fetch all companies:
+Then list companies:
 
 ```bash
 curl http://localhost:5000/api/companies
 ```
 
-Should see the company in the list.
+If the POST succeeds but the company doesn’t show up in GET, the backend is not writing to the same DB you expect (wrong URI/database) or the DB connection is unstable.
 
-### Step 4: Check Console Logs
-
-In browser console when adding company:
-- ✅ Look for: `Company successfully registered!`
-- ❌ Look for any error messages
-- Check Network tab for API responses
-
-### Common Issues
-
-| Issue | Solution |
-|-------|----------|
-| 500 error when adding company | Check backend logs for validation errors |
-| ECONNREFUSED on backend | MongoDB connection issue - check MONGO_URI |
-| Empty response from POST | Backend might be rejecting the data - verify all fields are provided |
-| Cannot read properties of undefined | Frontend not handling missing properties - fixed in latest update |
-
-### Local Testing Checklist
-
-- [ ] Backend `.env` has correct `MONGO_URI`
-- [ ] Backend server starts without errors
-- [ ] Can reach `http://localhost:5000/health` 
-- [ ] Can POST a company and get response
-- [ ] GET companies list shows the new company
-- [ ] Page refresh shows company still there
-- [ ] MongoDB Atlas cluster is running
-
-### For Render Deployment
-
-Make sure:
-1. Backend MONGO_URI environment variable is set in Render dashboard
-2. MongoDB Atlas IP whitelist includes Render's IPs
-3. Backend is deployed successfully
-4. Frontend has `VITE_API_BASE` pointing to Render backend URL
-
-### Still Not Working?
-
-1. Check backend logs on Render dashboard
-2. Look for MongoDB connection errors
-3. Verify Network tab in browser DevTools when adding company
-4. Check if 201 status code is returned from POST request
+## Render + Vercel checklist
+- Render backend has `MONGO_URI` set.
+- MongoDB Atlas whitelist allows Render to connect.
+- Frontend uses `VITE_API_BASE=https://<your-render-app>.onrender.com/api`.
