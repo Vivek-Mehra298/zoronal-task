@@ -40,14 +40,41 @@ app.get('/health', (req, res) => {
 });
 
 // Database connection & Server Startup
-mongoose.connect(MONGO_URI)
+console.log('\n🔄 Connecting to MongoDB...');
+
+mongoose.connect(MONGO_URI, {
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+  retryWrites: true,
+  w: 'majority',
+})
   .then(() => {
-    console.log('Successfully connected to MongoDB Database');
+    console.log('✅ Successfully connected to MongoDB Database');
     app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(`✅ Server is running on port ${PORT}`);
+      console.log(`📍 API available at http://localhost:${PORT}/api`);
+      console.log('✨ Ready to receive requests!');
     });
   })
   .catch((error) => {
-    console.error('Database connection error:', error.message);
+    console.error('❌ Database connection error:', error.message);
+    console.error('Troubleshooting:');
+    console.error('1. Check if MONGO_URI environment variable is set');
+    console.error('2. Verify MongoDB Atlas IP whitelist includes your IP');
+    console.error('3. Check if MongoDB Atlas cluster is running');
+    console.error('4. Verify network connectivity');
     process.exit(1);
   });
+
+// Handle connection errors after initial connection
+mongoose.connection.on('error', (err) => {
+  console.error('❌ MongoDB connection error after initial setup:', err.message);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.warn('⚠️  Disconnected from MongoDB');
+});
+
+mongoose.connection.on('reconnected', () => {
+  console.log('✅ Reconnected to MongoDB');
+});

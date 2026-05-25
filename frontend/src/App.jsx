@@ -75,12 +75,22 @@ export default function App() {
   const handleAddCompany = async (formData) => {
     try {
       const res = await axios.post(`${API_BASE}/companies`, formData);
-      // Update local company list with the newly created company
-      setCompanies((prev) => [res.data, ...prev]);
+      
+      // Add new company to local state
+      const newCompany = res.data;
+      setCompanies((prev) => [newCompany, ...prev]);
+      
       showToast('Company successfully registered!');
+      
+      // Verify data was saved by refreshing after a short delay
+      setTimeout(() => {
+        fetchCompanies();
+      }, 1000);
+      
     } catch (err) {
       console.error('Error creating company:', err);
-      showToast(err.response?.data?.message || 'Failed to create company.', 'error');
+      const errorMsg = err.response?.data?.message || 'Failed to create company.';
+      showToast(errorMsg, 'error');
       throw err;
     }
   };
